@@ -116,6 +116,7 @@
                 {
                     "type": "script",
                     "commands": [
+                        "export JAVA_HOME=/usr/lib/sdk/openjdk11/jvm/openjdk-11",
                         "export PATH=$PATH:/usr/lib/sdk/openjdk11/bin"
                     ],
                     "dest-filename": "enable.sh"
