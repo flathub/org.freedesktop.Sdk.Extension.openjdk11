@@ -73,8 +73,7 @@
             "name": "maven",
             "buildsystem": "simple",
             "cleanup": [
-                "*.cmd",
-                "/maven/lib/jansi-native/*"
+                "*.cmd"
             ],
             "sources": [
                 {
@@ -86,7 +85,7 @@
             ],
             "build-commands": [
                 "mkdir -p $FLATPAK_DEST/maven",
-                "tar xf apache-maven-bin.tar.gz --strip-components=1 --directory=$FLATPAK_DEST/maven",
+                "tar xf apache-maven-bin.tar.gz --strip-components=1 --exclude=jansi-native --directory=$FLATPAK_DEST/maven",
                 "ln -s $FLATPAK_DEST/maven/bin/mvn $FLATPAK_DEST/maven/bin/mvnDebug $FLATPAK_DEST/bin"
             ]
         },
