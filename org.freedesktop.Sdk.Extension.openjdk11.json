@@ -73,7 +73,8 @@
             "name": "maven",
             "buildsystem": "simple",
             "cleanup": [
-                "*.cmd"
+                "*.cmd",
+                "/maven/lib/jansi-native/*"
             ],
             "sources": [
                 {
