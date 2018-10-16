@@ -36,6 +36,7 @@
                 "--with-debug-level=release",
                 "--with-native-debug-symbols=internal",
                 "--enable-unlimited-crypto",
+                "--enable-system-nss",
                 "--with-zlib=system",
                 "--with-libjpeg=system",
                 "--with-giflib=system",
@@ -60,6 +61,10 @@
                     "type": "archive",
                     "url": "https://src.fedoraproject.org/repo/pkgs/java-11-openjdk/shenandoah-jdk11-shenandoah-jdk-11+28.tar.xz/sha512/4ca6a69cb1b67dd6749861de5f49e50a43c9c7a6100d4b55c722960fec90bb280dc995be7d76e9b2d4519ce0d8fef54c25be8e9b33b80d6c6ec9130ef166e4ee/shenandoah-jdk11-shenandoah-jdk-11+28.tar.xz",
                     "sha512": "4ca6a69cb1b67dd6749861de5f49e50a43c9c7a6100d4b55c722960fec90bb280dc995be7d76e9b2d4519ce0d8fef54c25be8e9b33b80d6c6ec9130ef166e4ee"
+                },
+                {
+                    "type": "patch",
+                    "path": "RHBZ-1565658-system-nss-SunEC.patch"
                 },
                 {
                     "type": "shell",

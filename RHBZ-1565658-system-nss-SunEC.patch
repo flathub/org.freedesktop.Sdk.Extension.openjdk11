@@ -1,0 +1,643 @@
+diff --git a/make/autoconf/jdk-options.m4 b/make/autoconf/jdk-options.m4
+--- a/make/autoconf/jdk-options.m4
++++ b/make/autoconf/jdk-options.m4
+@@ -267,9 +267,10 @@
+ #
+ AC_DEFUN_ONCE([JDKOPT_DETECT_INTREE_EC],
+ [
++  AC_REQUIRE([LIB_SETUP_MISC_LIBS])
+   AC_MSG_CHECKING([if elliptic curve crypto implementation is present])
+ 
+-  if test -d "${TOPDIR}/src/jdk.crypto.ec/share/native/libsunec/impl"; then
++  if test "x${system_nss}" = "xyes" -o -d "${TOPDIR}/src/jdk.crypto.ec/share/native/libsunec/impl"; then
+     ENABLE_INTREE_EC=true
+     AC_MSG_RESULT([yes])
+   else
+diff --git a/make/autoconf/libraries.m4 b/make/autoconf/libraries.m4
+--- a/make/autoconf/libraries.m4
++++ b/make/autoconf/libraries.m4
+@@ -180,6 +180,47 @@
+   AC_SUBST(LIBDL)
+   LIBS="$save_LIBS"
+ 
++  ###############################################################################
++  #
++  # Check for the NSS libraries
++  #
++
++  AC_MSG_CHECKING([whether to build the Sun EC provider against the system NSS libraries])
++
++  # default is bundled
++  DEFAULT_SYSTEM_NSS=no
++
++  AC_ARG_ENABLE([system-nss], [AS_HELP_STRING([--enable-system-nss],
++     [build the SunEC provider using the system NSS libraries @<:@disabled@:>@])],
++  [
++    case "${enableval}" in
++      yes)
++        system_nss=yes
++        ;;
++      *)
++        system_nss=no
++        ;;
++    esac
++  ],
++  [
++    system_nss=${DEFAULT_SYSTEM_NSS}
++  ])
++  AC_MSG_RESULT([$system_nss])
++
++  if test "x${system_nss}" = "xyes"; then
++      PKG_CHECK_MODULES(NSS, nss >= 3.16.1, [NSS_FOUND=yes], [NSS_FOUND=no])
++      if test "x${NSS_FOUND}" = "xyes"; then
++          NSS_LIBS="$NSS_LIBS -lfreebl";
++	  USE_EXTERNAL_NSS=true
++      else
++	  AC_MSG_ERROR([--enable-system-nss specified, but NSS not found.])
++      fi
++  else
++      USE_EXTERNAL_NSS=false
++  fi
++  AC_SUBST(USE_EXTERNAL_NSS)
++
++
+   # Deprecated libraries, keep the flags for backwards compatibility
+   if test "x$OPENJDK_TARGET_OS" = "xwindows"; then
+     BASIC_DEPRECATED_ARG_WITH([dxsdk])
+diff --git a/make/autoconf/spec.gmk.in b/make/autoconf/spec.gmk.in
+--- a/make/autoconf/spec.gmk.in
++++ b/make/autoconf/spec.gmk.in
+@@ -801,6 +801,10 @@
+ # Libraries
+ #
+ 
++USE_EXTERNAL_NSS:=@USE_EXTERNAL_NSS@
++NSS_LIBS:=@NSS_LIBS@
++NSS_CFLAGS:=@NSS_CFLAGS@
++
+ USE_EXTERNAL_LCMS:=@USE_EXTERNAL_LCMS@
+ LCMS_CFLAGS:=@LCMS_CFLAGS@
+ LCMS_LIBS:=@LCMS_LIBS@
+diff --git a/make/lib/Lib-jdk.crypto.ec.gmk b/make/lib/Lib-jdk.crypto.ec.gmk
+--- a/make/lib/Lib-jdk.crypto.ec.gmk
++++ b/make/lib/Lib-jdk.crypto.ec.gmk
+@@ -38,6 +38,11 @@
+     BUILD_LIBSUNEC_CXXFLAGS_JDKLIB := $(CXXFLAGS_JDKLIB)
+   endif
+ 
++  ifeq ($(USE_EXTERNAL_NSS), true)
++    BUILD_LIBSUNEC_CFLAGS_JDKLIB += $(NSS_CFLAGS) -DSYSTEM_NSS -DNSS_ENABLE_ECC
++    BUILD_LIBSUNEC_CXXFLAGS_JDKLIB += $(NSS_CFLAGS) -DSYSTEM_NSS -DNSS_ENABLE_ECC
++  endif
++
+   $(eval $(call SetupJdkLibrary, BUILD_LIBSUNEC, \
+       NAME := sunec, \
+       TOOLCHAIN := TOOLCHAIN_LINK_CXX, \
+@@ -47,9 +52,11 @@
+       CXXFLAGS := $(BUILD_LIBSUNEC_CXXFLAGS_JDKLIB), \
+       DISABLED_WARNINGS_gcc := sign-compare implicit-fallthrough, \
+       DISABLED_WARNINGS_microsoft := 4101 4244 4146 4018, \
+-      LDFLAGS := $(LDFLAGS_JDKLIB) $(LDFLAGS_CXX_JDK), \
++      LDFLAGS := $(subst -Xlinker --as-needed,, \
++                 $(subst -Wl$(COMMA)--as-needed,, $(LDFLAGS_JDKLIB))) $(LDFLAGS_CXX_JDK), \
+       LDFLAGS_macosx := $(call SET_SHARED_LIBRARY_ORIGIN), \
+       LIBS := $(LIBCXX), \
++      LIBS_linux := -lc $(NSS_LIBS), \
+   ))
+ 
+   TARGETS += $(BUILD_LIBSUNEC)
+diff --git a/src/java.base/unix/native/include/jni_md.h b/src/java.base/unix/native/include/jni_md.h
+--- a/src/java.base/unix/native/include/jni_md.h
++++ b/src/java.base/unix/native/include/jni_md.h
+@@ -41,6 +41,11 @@
+   #define JNIEXPORT
+   #define JNIIMPORT
+ #endif
++#if (defined(__GNUC__)) || __has_attribute(unused)
++  #define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
++#else
++  #define UNUSED(x) UNUSED_ ## x
++#endif
+ 
+ #define JNICALL
+ 
+diff --git a/src/jdk.crypto.ec/share/classes/sun/security/ec/SunEC.java b/src/jdk.crypto.ec/share/classes/sun/security/ec/SunEC.java
+--- a/src/jdk.crypto.ec/share/classes/sun/security/ec/SunEC.java
++++ b/src/jdk.crypto.ec/share/classes/sun/security/ec/SunEC.java
+@@ -61,6 +61,7 @@
+             AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                 public Void run() {
+                     System.loadLibrary("sunec"); // check for native library
++                    initialize();
+                     return null;
+                 }
+             });
+@@ -293,6 +294,11 @@
+             "ECDH", "sun.security.ec.ECDHKeyAgreement", null, ATTRS));
+     }
+ 
++    /**
++     * Initialize the native code.
++     */
++    private static native void initialize();
++
+     private void putXDHEntries() {
+ 
+         HashMap<String, String> ATTRS = new HashMap<>(1);
+diff --git a/src/jdk.crypto.ec/share/native/libsunec/ECC_JNI.cpp b/src/jdk.crypto.ec/share/native/libsunec/ECC_JNI.cpp
+--- a/src/jdk.crypto.ec/share/native/libsunec/ECC_JNI.cpp
++++ b/src/jdk.crypto.ec/share/native/libsunec/ECC_JNI.cpp
+@@ -25,7 +25,11 @@
+ 
+ #include <jni.h>
+ #include "jni_util.h"
++#ifdef SYSTEM_NSS
++#include "ecc_impl.h"
++#else
+ #include "impl/ecc_impl.h"
++#endif
+ #include "sun_security_ec_ECDHKeyAgreement.h"
+ #include "sun_security_ec_ECKeyPairGenerator.h"
+ #include "sun_security_ec_ECDSASignature.h"
+@@ -33,6 +37,13 @@
+ #define INVALID_PARAMETER_EXCEPTION \
+         "java/security/InvalidParameterException"
+ #define KEY_EXCEPTION   "java/security/KeyException"
++#define INTERNAL_ERROR "java/lang/InternalError"
++
++#ifdef SYSTEM_NSS
++#define SYSTEM_UNUSED(x) UNUSED(x)
++#else
++#define SYSTEM_UNUSED(x) x
++#endif
+ 
+ extern "C" {
+ 
+@@ -55,8 +66,13 @@
+ /*
+  * Deep free of the ECParams struct
+  */
+-void FreeECParams(ECParams *ecparams, jboolean freeStruct)
++void FreeECParams(ECParams *ecparams, jboolean SYSTEM_UNUSED(freeStruct))
+ {
++#ifdef SYSTEM_NSS
++    // Needs to be freed using the matching method to the one
++    // that allocated it. PR_TRUE means the memory is zeroed.
++    PORT_FreeArena(ecparams->arena, PR_TRUE);
++#else
+     // Use B_FALSE to free the SECItem->data element, but not the SECItem itself
+     // Use B_TRUE to free both
+ 
+@@ -70,6 +86,7 @@
+     SECITEM_FreeItem(&ecparams->curveOID, B_FALSE);
+     if (freeStruct)
+         free(ecparams);
++#endif
+ }
+ 
+ jbyteArray getEncodedBytes(JNIEnv *env, SECItem *hSECItem)
+@@ -139,7 +156,7 @@
+  */
+ JNIEXPORT jobjectArray
+ JNICALL Java_sun_security_ec_ECKeyPairGenerator_generateECKeyPair
+-  (JNIEnv *env, jclass clazz, jint keySize, jbyteArray encodedParams, jbyteArray seed)
++  (JNIEnv *env, jclass UNUSED(clazz), jint UNUSED(keySize), jbyteArray encodedParams, jbyteArray seed)
+ {
+     ECPrivateKey *privKey = NULL; // contains both public and private values
+     ECParams *ecparams = NULL;
+@@ -171,8 +188,17 @@
+     env->GetByteArrayRegion(seed, 0, jSeedLength, pSeedBuffer);
+ 
+     // Generate the new keypair (using the supplied seed)
++#ifdef SYSTEM_NSS
++    if (RNG_RandomUpdate((unsigned char *) pSeedBuffer, jSeedLength)
++        != SECSuccess) {
++        ThrowException(env, KEY_EXCEPTION);
++        goto cleanup;
++    }
++    if (EC_NewKey(ecparams, &privKey) != SECSuccess) {    
++#else    
+     if (EC_NewKey(ecparams, &privKey, (unsigned char *) pSeedBuffer,
+         jSeedLength, 0) != SECSuccess) {
++#endif
+         ThrowException(env, KEY_EXCEPTION);
+         goto cleanup;
+     }
+@@ -219,10 +245,15 @@
+         }
+         if (privKey) {
+             FreeECParams(&privKey->ecParams, false);
++#ifndef SYSTEM_NSS
++	    // The entire ECPrivateKey is allocated in the arena
++	    // when using system NSS, so only the in-tree version
++	    // needs to clear these manually.
+             SECITEM_FreeItem(&privKey->version, B_FALSE);
+             SECITEM_FreeItem(&privKey->privateValue, B_FALSE);
+             SECITEM_FreeItem(&privKey->publicValue, B_FALSE);
+             free(privKey);
++#endif
+         }
+ 
+         if (pSeedBuffer) {
+@@ -240,7 +271,7 @@
+  */
+ JNIEXPORT jbyteArray
+ JNICALL Java_sun_security_ec_ECDSASignature_signDigest
+-  (JNIEnv *env, jclass clazz, jbyteArray digest, jbyteArray privateKey, jbyteArray encodedParams, jbyteArray seed, jint timing)
++  (JNIEnv *env, jclass UNUSED(clazz), jbyteArray digest, jbyteArray privateKey, jbyteArray encodedParams, jbyteArray seed, jint timing)
+ {
+     jbyte* pDigestBuffer = NULL;
+     jint jDigestLength = env->GetArrayLength(digest);
+@@ -299,8 +330,18 @@
+     env->GetByteArrayRegion(seed, 0, jSeedLength, pSeedBuffer);
+ 
+     // Sign the digest (using the supplied seed)
++#ifdef SYSTEM_NSS
++    if (RNG_RandomUpdate((unsigned char *) pSeedBuffer, jSeedLength)
++        != SECSuccess) {
++        ThrowException(env, KEY_EXCEPTION);
++        goto cleanup;
++    }
++    if (ECDSA_SignDigest(&privKey, &signature_item, &digest_item)
++        != SECSuccess) {    
++#else    
+     if (ECDSA_SignDigest(&privKey, &signature_item, &digest_item,
+         (unsigned char *) pSeedBuffer, jSeedLength, 0, timing) != SECSuccess) {
++#endif
+         ThrowException(env, KEY_EXCEPTION);
+         goto cleanup;
+     }
+@@ -349,7 +390,7 @@
+  */
+ JNIEXPORT jboolean
+ JNICALL Java_sun_security_ec_ECDSASignature_verifySignedDigest
+-  (JNIEnv *env, jclass clazz, jbyteArray signedDigest, jbyteArray digest, jbyteArray publicKey, jbyteArray encodedParams)
++  (JNIEnv *env, jclass UNUSED(clazz), jbyteArray signedDigest, jbyteArray digest, jbyteArray publicKey, jbyteArray encodedParams)
+ {
+     jboolean isValid = false;
+ 
+@@ -406,9 +447,10 @@
+ 
+ cleanup:
+     {
+-        if (params_item.data)
++        if (params_item.data) {
+             env->ReleaseByteArrayElements(encodedParams,
+                 (jbyte *) params_item.data, JNI_ABORT);
++	}
+ 
+         if (pubKey.publicValue.data)
+             env->ReleaseByteArrayElements(publicKey,
+@@ -434,7 +476,7 @@
+  */
+ JNIEXPORT jbyteArray
+ JNICALL Java_sun_security_ec_ECDHKeyAgreement_deriveKey
+-  (JNIEnv *env, jclass clazz, jbyteArray privateKey, jbyteArray publicKey, jbyteArray encodedParams)
++  (JNIEnv *env, jclass UNUSED(clazz), jbyteArray privateKey, jbyteArray publicKey, jbyteArray encodedParams)
+ {
+     jbyteArray jSecret = NULL;
+     ECParams *ecparams = NULL;
+@@ -510,9 +552,10 @@
+             env->ReleaseByteArrayElements(publicKey,
+                 (jbyte *) publicValue_item.data, JNI_ABORT);
+ 
+-        if (params_item.data)
++        if (params_item.data) {
+             env->ReleaseByteArrayElements(encodedParams,
+                 (jbyte *) params_item.data, JNI_ABORT);
++	}
+ 
+         if (ecparams)
+             FreeECParams(ecparams, true);
+@@ -521,4 +564,28 @@
+     return jSecret;
+ }
+ 
++JNIEXPORT void
++JNICALL Java_sun_security_ec_SunEC_initialize
++  (JNIEnv *env, jclass UNUSED(clazz))
++{
++#ifdef SYSTEM_NSS
++    if (SECOID_Init() != SECSuccess) {
++        ThrowException(env, INTERNAL_ERROR);
++    }
++    if (RNG_RNGInit() != SECSuccess) {
++        ThrowException(env, INTERNAL_ERROR);
++    }
++#endif
++}
++
++JNIEXPORT void
++JNICALL JNI_OnUnload
++  (JavaVM *vm, void *reserved)
++{
++#ifdef SYSTEM_NSS
++    RNG_RNGShutdown();
++    SECOID_Shutdown();
++#endif
++}
++
+ } /* extern "C" */
+diff --git a/src/jdk.crypto.ec/share/native/libsunec/ecc_impl.h b/src/jdk.crypto.ec/share/native/libsunec/ecc_impl.h
+new file mode 100644
+--- /dev/null
++++ b/src/jdk.crypto.ec/share/native/libsunec/ecc_impl.h
+@@ -0,0 +1,298 @@
++/*
++ * Copyright (c) 2007, 2017, Oracle and/or its affiliates. All rights reserved.
++ * Use is subject to license terms.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library; if not, write to the Free Software Foundation,
++ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ *
++ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
++ * or visit www.oracle.com if you need additional information or have any
++ * questions.
++ */
++
++/* *********************************************************************
++ *
++ * The Original Code is the Netscape security libraries.
++ *
++ * The Initial Developer of the Original Code is
++ * Netscape Communications Corporation.
++ * Portions created by the Initial Developer are Copyright (C) 1994-2000
++ * the Initial Developer. All Rights Reserved.
++ *
++ * Contributor(s):
++ *   Dr Vipul Gupta <vipul.gupta@sun.com> and
++ *   Douglas Stebila <douglas@stebila.ca>, Sun Microsystems Laboratories
++ *
++ * Last Modified Date from the Original Code: May 2017
++ *********************************************************************** */
++
++#ifndef _ECC_IMPL_H
++#define _ECC_IMPL_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#include <sys/types.h>
++
++#ifdef SYSTEM_NSS
++#include <secitem.h>
++#include <secerr.h>
++#include <keythi.h>
++#ifdef LEGACY_NSS
++#include <softoken.h>
++#else
++#include <blapi.h>
++#endif
++#else
++#include "ecl-exp.h"
++#endif
++
++/*
++ * Multi-platform definitions
++ */
++#ifdef __linux__
++#define B_FALSE FALSE
++#define B_TRUE TRUE
++typedef unsigned char uint8_t;
++typedef unsigned long ulong_t;
++typedef enum { B_FALSE, B_TRUE } boolean_t;
++#endif /* __linux__ */
++
++#ifdef _ALLBSD_SOURCE
++#include <stdint.h>
++#define B_FALSE FALSE
++#define B_TRUE TRUE
++typedef unsigned long ulong_t;
++typedef enum boolean { B_FALSE, B_TRUE } boolean_t;
++#endif /* _ALLBSD_SOURCE */
++
++#ifdef AIX
++#define B_FALSE FALSE
++#define B_TRUE TRUE
++typedef unsigned char uint8_t;
++typedef unsigned long ulong_t;
++#endif /* AIX */
++
++#ifdef _WIN32
++typedef unsigned char uint8_t;
++typedef unsigned long ulong_t;
++typedef enum boolean { B_FALSE, B_TRUE } boolean_t;
++#define strdup _strdup          /* Replace POSIX name with ISO C++ name */
++#endif /* _WIN32 */
++
++#ifndef _KERNEL
++#include <stdlib.h>
++#endif  /* _KERNEL */
++
++#define EC_MAX_DIGEST_LEN 1024  /* max digest that can be signed */
++#define EC_MAX_POINT_LEN 145    /* max len of DER encoded Q */
++#define EC_MAX_VALUE_LEN 72     /* max len of ANSI X9.62 private value d */
++#define EC_MAX_SIG_LEN 144      /* max signature len for supported curves */
++#define EC_MIN_KEY_LEN  112     /* min key length in bits */
++#define EC_MAX_KEY_LEN  571     /* max key length in bits */
++#define EC_MAX_OID_LEN 10       /* max length of OID buffer */
++
++/*
++ * Various structures and definitions from NSS are here.
++ */
++
++#ifndef SYSTEM_NSS
++#ifdef _KERNEL
++#define PORT_ArenaAlloc(a, n, f)        kmem_alloc((n), (f))
++#define PORT_ArenaZAlloc(a, n, f)       kmem_zalloc((n), (f))
++#define PORT_ArenaGrow(a, b, c, d)      NULL
++#define PORT_ZAlloc(n, f)               kmem_zalloc((n), (f))
++#define PORT_Alloc(n, f)                kmem_alloc((n), (f))
++#else
++#define PORT_ArenaAlloc(a, n, f)        malloc((n))
++#define PORT_ArenaZAlloc(a, n, f)       calloc(1, (n))
++#define PORT_ArenaGrow(a, b, c, d)      NULL
++#define PORT_ZAlloc(n, f)               calloc(1, (n))
++#define PORT_Alloc(n, f)                malloc((n))
++#endif
++
++#define PORT_NewArena(b)                (char *)12345
++#define PORT_ArenaMark(a)               NULL
++#define PORT_ArenaUnmark(a, b)
++#define PORT_ArenaRelease(a, m)
++#define PORT_FreeArena(a, b)
++#define PORT_Strlen(s)                  strlen((s))
++#define PORT_SetError(e)
++
++#define PRBool                          boolean_t
++#define PR_TRUE                         B_TRUE
++#define PR_FALSE                        B_FALSE
++
++#ifdef _KERNEL
++#define PORT_Assert                     ASSERT
++#define PORT_Memcpy(t, f, l)            bcopy((f), (t), (l))
++#else
++#define PORT_Assert                     assert
++#define PORT_Memcpy(t, f, l)            memcpy((t), (f), (l))
++#endif
++
++#endif
++
++#define CHECK_OK(func) if (func == NULL) goto cleanup
++#define CHECK_SEC_OK(func) if (SECSuccess != (rv = func)) goto cleanup
++
++#ifndef SYSTEM_NSS
++typedef enum {
++        siBuffer = 0,
++        siClearDataBuffer = 1,
++        siCipherDataBuffer = 2,
++        siDERCertBuffer = 3,
++        siEncodedCertBuffer = 4,
++        siDERNameBuffer = 5,
++        siEncodedNameBuffer = 6,
++        siAsciiNameString = 7,
++        siAsciiString = 8,
++        siDEROID = 9,
++        siUnsignedInteger = 10,
++        siUTCTime = 11,
++        siGeneralizedTime = 12
++} SECItemType;
++
++typedef struct SECItemStr SECItem;
++
++struct SECItemStr {
++        SECItemType type;
++        unsigned char *data;
++        unsigned int len;
++};
++
++typedef SECItem SECKEYECParams;
++
++typedef enum { ec_params_explicit,
++               ec_params_named
++} ECParamsType;
++
++typedef enum { ec_field_GFp = 1,
++               ec_field_GF2m
++} ECFieldType;
++
++struct ECFieldIDStr {
++    int         size;   /* field size in bits */
++    ECFieldType type;
++    union {
++        SECItem  prime; /* prime p for (GFp) */
++        SECItem  poly;  /* irreducible binary polynomial for (GF2m) */
++    } u;
++    int         k1;     /* first coefficient of pentanomial or
++                         * the only coefficient of trinomial
++                         */
++    int         k2;     /* two remaining coefficients of pentanomial */
++    int         k3;
++};
++typedef struct ECFieldIDStr ECFieldID;
++
++struct ECCurveStr {
++        SECItem a;      /* contains octet stream encoding of
++                         * field element (X9.62 section 4.3.3)
++                         */
++        SECItem b;
++        SECItem seed;
++};
++typedef struct ECCurveStr ECCurve;
++
++typedef void PRArenaPool;
++
++struct ECParamsStr {
++    PRArenaPool * arena;
++    ECParamsType  type;
++    ECFieldID     fieldID;
++    ECCurve       curve;
++    SECItem       base;
++    SECItem       order;
++    int           cofactor;
++    SECItem       DEREncoding;
++    ECCurveName   name;
++    SECItem       curveOID;
++};
++typedef struct ECParamsStr ECParams;
++
++struct ECPublicKeyStr {
++    ECParams ecParams;
++    SECItem publicValue;   /* elliptic curve point encoded as
++                            * octet stream.
++                            */
++};
++typedef struct ECPublicKeyStr ECPublicKey;
++
++struct ECPrivateKeyStr {
++    ECParams ecParams;
++    SECItem publicValue;   /* encoded ec point */
++    SECItem privateValue;  /* private big integer */
++    SECItem version;       /* As per SEC 1, Appendix C, Section C.4 */
++};
++typedef struct ECPrivateKeyStr ECPrivateKey;
++
++typedef enum _SECStatus {
++        SECBufferTooSmall = -3,
++        SECWouldBlock = -2,
++        SECFailure = -1,
++        SECSuccess = 0
++} SECStatus;
++#endif
++
++#ifdef _KERNEL
++#define RNG_GenerateGlobalRandomBytes(p,l) ecc_knzero_random_generator((p), (l))
++#else
++/*
++ This function is no longer required because the random bytes are now
++ supplied by the caller. Force a failure.
++*/
++#ifndef SYSTEM_NSS
++#define RNG_GenerateGlobalRandomBytes(p,l) SECFailure
++#endif
++#endif
++#define CHECK_MPI_OK(func) if (MP_OKAY > (err = func)) goto cleanup
++#define MP_TO_SEC_ERROR(err)
++
++#define SECITEM_TO_MPINT(it, mp)                                        \
++        CHECK_MPI_OK(mp_read_unsigned_octets((mp), (it).data, (it).len))
++
++extern int ecc_knzero_random_generator(uint8_t *, size_t);
++extern ulong_t soft_nzero_random_generator(uint8_t *, ulong_t);
++
++#ifdef SYSTEM_NSS
++#define EC_DecodeParams(a,b,c) EC_DecodeParams(a,b)
++#define ECDSA_VerifyDigest(a,b,c,d) ECDSA_VerifyDigest(a,b,c)
++#define ECDH_Derive(a,b,c,d,e,f) ECDH_Derive(a,b,c,d,e)
++#else
++extern SECStatus EC_DecodeParams(const SECItem *, ECParams **, int);
++
++extern SECItem * SECITEM_AllocItem(PRArenaPool *, SECItem *, unsigned int, int);
++extern SECStatus SECITEM_CopyItem(PRArenaPool *, SECItem *, const SECItem *,
++    int);
++extern void SECITEM_FreeItem(SECItem *, boolean_t);
++
++/* This function has been modified to accept an array of random bytes */
++extern SECStatus EC_NewKey(ECParams *ecParams, ECPrivateKey **privKey,
++    const unsigned char* random, int randomlen, int);
++/* This function has been modified to accept an array of random bytes */
++extern SECStatus ECDSA_SignDigest(ECPrivateKey *, SECItem *, const SECItem *,
++    const unsigned char* random, int randomlen, int, int timing);
++extern SECStatus ECDSA_VerifyDigest(ECPublicKey *, const SECItem *,
++    const SECItem *, int);
++extern SECStatus ECDH_Derive(SECItem *, ECParams *, SECItem *, boolean_t,
++    SECItem *, int);
++#endif
++
++#ifdef  __cplusplus
++}
++#endif
++
++#endif /* _ECC_IMPL_H */ 
