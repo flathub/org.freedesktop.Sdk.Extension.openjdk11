@@ -58,8 +58,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://src.fedoraproject.org/repo/pkgs/java-11-openjdk/shenandoah-jdk11-shenandoah-jdk-11+28.tar.xz/sha512/4ca6a69cb1b67dd6749861de5f49e50a43c9c7a6100d4b55c722960fec90bb280dc995be7d76e9b2d4519ce0d8fef54c25be8e9b33b80d6c6ec9130ef166e4ee/shenandoah-jdk11-shenandoah-jdk-11+28.tar.xz",
-                    "sha512": "4ca6a69cb1b67dd6749861de5f49e50a43c9c7a6100d4b55c722960fec90bb280dc995be7d76e9b2d4519ce0d8fef54c25be8e9b33b80d6c6ec9130ef166e4ee"
+                    "url": "https://fedorapeople.org/~mbooth/jdk11/shenandoah-jdk11-shenandoah-jdk-11.0.1+13.tar.xz",
+                    "sha512": "6e3ce6e97171cf9d071dc8134351be8877a3cc68d813b9d14f4e5f9454a85242a80dbcc02c7c655f5567ea84b0179f1e7328caa81767839b745988ca51b5b60b"
                 },
                 {
                     "type": "shell",
@@ -123,7 +123,7 @@
                 }
             ],
             "build-commands": [
-                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.0 openjdk-11)",
+                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.1 openjdk-11)",
                 "cp enable.sh install.sh installjdk.sh /usr/lib/sdk/openjdk11/"
             ]
         },
