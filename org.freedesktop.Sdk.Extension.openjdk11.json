@@ -30,7 +30,7 @@
             "config-opts": [
                 "--with-boot-jdk=/usr/lib/sdk/openjdk10/jvm/openjdk-10",
                 "--with-jvm-variants=server",
-                "--with-version-build=28",
+                "--with-version-build=13",
                 "--with-version-pre=",
                 "--with-version-opt=",
                 "--with-debug-level=release",
