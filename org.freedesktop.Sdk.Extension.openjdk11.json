@@ -30,7 +30,7 @@
             "config-opts": [
                 "--with-boot-jdk=/usr/lib/sdk/openjdk10/jvm/openjdk-10",
                 "--with-jvm-variants=server",
-                "--with-version-build=13",
+                "--with-version-build=9",
                 "--with-version-pre=",
                 "--with-version-opt=",
                 "--with-debug-level=release",
@@ -58,8 +58,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://fedorapeople.org/~mbooth/jdk11/shenandoah-jdk11-shenandoah-jdk-11.0.1+13.tar.xz",
-                    "sha512": "6e3ce6e97171cf9d071dc8134351be8877a3cc68d813b9d14f4e5f9454a85242a80dbcc02c7c655f5567ea84b0179f1e7328caa81767839b745988ca51b5b60b"
+                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.2+9.tar.gz",
+                    "sha512": "8562899d8031430ad8fd11aabb50bad459235ae2ff50273a501259c19b52edb30bdce94cdc958cb293048582b49bd3249a7af986d53de03f947654419da55e60"
                 },
                 {
                     "type": "shell",
@@ -78,9 +78,9 @@
             "sources": [
                 {
                     "type": "file",
-                    "url": "http://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz",
+                    "url": "http://archive.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz",
                     "dest-filename": "apache-maven-bin.tar.gz",
-                    "sha512": "2a803f578f341e164f6753e410413d16ab60fabe31dc491d1fe35c984a5cce696bc71f57757d4538fe7738be04065a216f3ebad4ef7e0ce1bb4c51bc36d6be86"
+                    "sha512": "fae9c12b570c3ba18116a4e26ea524b29f7279c17cbaadc3326ca72927368924d9131d11b9e851b8dc9162228b6fdea955446be41207a5cfc61283dd8a561d2f"
                 }
             ],
             "build-commands": [
@@ -123,7 +123,7 @@
                 }
             ],
             "build-commands": [
-                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.1 openjdk-11)",
+                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.2 openjdk-11)",
                 "cp enable.sh install.sh installjdk.sh /usr/lib/sdk/openjdk11/"
             ]
         },
