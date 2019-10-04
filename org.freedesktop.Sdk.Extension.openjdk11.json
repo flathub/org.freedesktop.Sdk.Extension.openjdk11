@@ -5,9 +5,6 @@
     "runtime-version": "18.08",
     "build-extension": true,
     "sdk": "org.freedesktop.Sdk",
-    "sdk-extensions": [
-        "org.freedesktop.Sdk.Extension.openjdk10"
-    ],
     "separate-locales": false,
     "appstream-compose": false,
     "cleanup": [
@@ -24,13 +21,62 @@
     },
     "modules": [
         {
+            "name": "bootstrap",
+            "buildsystem": "simple",
+            "cleanup": [
+                "*"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "only-arches": [
+                        "i386"
+                    ],
+                    "url": "https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.4.11-0.fc29.i686.tar.bz2",
+                    "dest-filename": "java-openjdk.tar.bz2",
+                    "sha512": "589a25b5798cc1d5b74911fee7aee69de78be76be0d73d54e86341753f992c11c7b82f11aeaef88e321ea365be7de1c03e9196361adb8407d947807989cb65ac"
+                },
+                {
+                    "type": "file",
+                    "only-arches": [
+                        "x86_64"
+                    ],
+                    "url": "https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.4.11-0.fc29.x86_64.tar.bz2",
+                    "dest-filename": "java-openjdk.tar.bz2",
+                    "sha512": "70c23a318e9e3f8292004fa4dc96397e68c747a459f06c7376da300133ade84f7177aef3639a14ee3a83fcaa7850d542fa97cdd4cf0cd41318ab1e299a3f0685"
+                },
+                {
+                    "type": "file",
+                    "only-arches": [
+                        "arm"
+                    ],
+                    "url": "https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.4.11-0.fc29.armv7hl.tar.bz2",
+                    "dest-filename": "java-openjdk.tar.bz2",
+                    "sha512": "7c3c42974d9ca15bdbe35f781e5149ab07256634efb74d7515e7ed9bf201c10366b91f5f49e01917a22e19808b84b9c9ec2feec3d0d3f7aa5b3b962f9fa77aa7"
+                },
+                {
+                    "type": "file",
+                    "only-arches": [
+                        "aarch64"
+                    ],
+                    "url": "https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.4.11-0.fc29.aarch64.tar.bz2",
+                    "dest-filename": "java-openjdk.tar.bz2",
+                    "sha512": "966b3b56091339ebd5b3d4cd6e119455bb0633fff450d8af359a42d08946ed6cc2c9ee97c9ac0b127e893da6ed4592897f3a70491196594ab2d55ebb0b9b7d58"
+                }
+            ],
+            "build-commands": [
+                "mkdir -p $FLATPAK_DEST/bootstrap-java",
+                "tar xf java-openjdk.tar.bz2 --strip-components=4 --directory=$FLATPAK_DEST/bootstrap-java"
+            ]
+        },
+        {
             "name": "java",
             "buildsystem": "autotools",
             "no-parallel-make": true,
             "config-opts": [
-                "--with-boot-jdk=/usr/lib/sdk/openjdk10/jvm/openjdk-10",
+                "--with-boot-jdk=/usr/lib/sdk/openjdk11/bootstrap-java",
                 "--with-jvm-variants=server",
-                "--with-version-build=11",
+                "--with-version-build=9",
                 "--with-version-pre=",
                 "--with-version-opt=",
                 "--with-debug-level=release",
@@ -58,8 +104,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.4+11.tar.gz",
-                    "sha512": "02af8b9f77dcbd12c3d41b18435c21e6d6f23b5bf9c24a200c2ecf8d3e87eb2873f5689746926caec40afbf16ed90089f3968f1e6049666fb2072585fdced336"
+                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.5+9.tar.gz",
+                    "sha512": "a1eb99407e65411080a5984c596adb5d3a880eb2234e1299dc25c13335e7c0183f840f398e82108e2277607ca577a03b2ca2f190d85506291d175c400339e08a"
                 },
                 {
                     "type": "shell",
@@ -78,9 +124,9 @@
             "sources": [
                 {
                     "type": "file",
-                    "url": "http://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz",
+                    "url": "http://archive.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz",
                     "dest-filename": "apache-maven-bin.tar.gz",
-                    "sha512": "b4880fb7a3d81edd190a029440cdf17f308621af68475a4fe976296e71ff4a4b546dd6d8a58aaafba334d309cc11e638c52808a4b0e818fc0fd544226d952544"
+                    "sha512": "d941423d115cd021514bfd06c453658b1b3e39e6240969caf4315ab7119a77299713f14b620fb2571a264f8dff2473d8af3cb47b05acf0036fc2553199a5c1ee"
                 }
             ],
             "build-commands": [
@@ -123,7 +169,7 @@
                 }
             ],
             "build-commands": [
-                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.4 openjdk-11)",
+                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.5 openjdk-11)",
                 "cp enable.sh install.sh installjdk.sh /usr/lib/sdk/openjdk11/"
             ]
         },
@@ -131,8 +177,8 @@
             "name": "appdata",
             "buildsystem": "simple",
             "build-commands": [
-                "mkdir -p ${FLATPAK_DEST}/share/appdata",
-                "cp org.freedesktop.Sdk.Extension.openjdk11.appdata.xml ${FLATPAK_DEST}/share/appdata",
+                "mkdir -p ${FLATPAK_DEST}/share/metainfo",
+                "cp org.freedesktop.Sdk.Extension.openjdk11.appdata.xml ${FLATPAK_DEST}/share/metainfo",
                 "appstream-compose --basename=org.freedesktop.Sdk.Extension.openjdk11 --prefix=${FLATPAK_DEST} --origin=flatpak org.freedesktop.Sdk.Extension.openjdk11"
             ],
             "sources": [
