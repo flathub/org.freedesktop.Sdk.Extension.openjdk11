@@ -76,7 +76,7 @@
             "config-opts": [
                 "--with-boot-jdk=/usr/lib/sdk/openjdk11/bootstrap-java",
                 "--with-jvm-variants=server",
-                "--with-version-build=9",
+                "--with-version-build=10",
                 "--with-version-pre=",
                 "--with-version-opt=",
                 "--with-debug-level=release",
@@ -101,11 +101,14 @@
                 "CFLAGS_WARNINGS_ARE_ERRORS=-Wno-error",
                 "images"
             ],
+            "post-install": [
+                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.5 openjdk-11)"
+            ],
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.5+9.tar.gz",
-                    "sha512": "a1eb99407e65411080a5984c596adb5d3a880eb2234e1299dc25c13335e7c0183f840f398e82108e2277607ca577a03b2ca2f190d85506291d175c400339e08a"
+                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.5+10.tar.gz",
+                    "sha512": "20267acb643b0ea10b36f5c4de6381890fb4efb2c450d1007a1abbbd32c827e88c914d49efb53c470f78d6ec1c1b7bea8955a163c41d251915e61d9c822fedf6"
                 },
                 {
                     "type": "shell",
@@ -113,6 +116,19 @@
                         "chmod a+x configure"
                     ]
                 }
+            ]
+        },
+        {
+            "name": "cacerts",
+            "buildsystem": "simple",
+            "sources": [
+                {
+                    "type": "file",
+                    "path": "extract_cacerts.sh"
+                }
+            ],
+            "build-commands": [
+                "./extract_cacerts.sh /usr/lib/sdk/openjdk11/jvm/openjdk-11"
             ]
         },
         {
@@ -211,7 +227,6 @@
                 }
             ],
             "build-commands": [
-                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.5 openjdk-11)",
                 "cp enable.sh install.sh installjdk.sh /usr/lib/sdk/openjdk11/"
             ]
         },
