@@ -76,7 +76,7 @@
             "config-opts": [
                 "--with-boot-jdk=/usr/lib/sdk/openjdk11/bootstrap-java",
                 "--with-jvm-variants=server",
-                "--with-version-build=10",
+                "--with-version-build=9",
                 "--with-version-pre=",
                 "--with-version-opt=",
                 "--with-debug-level=release",
@@ -102,13 +102,13 @@
                 "images"
             ],
             "post-install": [
-                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.6 openjdk-11)"
+                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.7 openjdk-11)"
             ],
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.6+10.tar.gz",
-                    "sha512": "1193f168b010df2e0e5fdc278f257fbc5f732f6d4006341e20bb07adb56aa07630d765135eccb74d4b9fb8ca051f48849a2a9513a25baaa1da7f55afb858b0ad"
+                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.7+9.tar.gz",
+                    "sha512": "afce66f414214b5aeba300eab6de033b88169a52a09bb6f1e7fd0f6a3edd38f3ed26e640cf142185cd8bf490139ebc3bccbf39d1a64c49a6519725e0b52116a2"
                 },
                 {
                     "type": "shell",
@@ -182,9 +182,9 @@
             "sources": [
                 {
                     "type": "file",
-                    "url": "https://services.gradle.org/distributions/gradle-6.1-bin.zip",
+                    "url": "https://services.gradle.org/distributions/gradle-6.3-bin.zip",
                     "dest-filename": "gradle-bin.zip",
-                    "sha256": "d0c43d14e1c70a48b82442f435d06186351a2d290d72afd5b8866f15e6d7038a"
+                    "sha256": "038794feef1f4745c6347107b6726279d1c824f3fc634b60f86ace1e9fbd1768"
                 }
             ],
             "build-commands": [
