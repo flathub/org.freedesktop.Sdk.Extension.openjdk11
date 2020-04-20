@@ -76,7 +76,7 @@
             "config-opts": [
                 "--with-boot-jdk=/usr/lib/sdk/openjdk11/bootstrap-java",
                 "--with-jvm-variants=server",
-                "--with-version-build=9",
+                "--with-version-build=10",
                 "--with-version-pre=",
                 "--with-version-opt=",
                 "--with-debug-level=release",
@@ -107,8 +107,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.7+9.tar.gz",
-                    "sha512": "afce66f414214b5aeba300eab6de033b88169a52a09bb6f1e7fd0f6a3edd38f3ed26e640cf142185cd8bf490139ebc3bccbf39d1a64c49a6519725e0b52116a2"
+                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.7+10.tar.gz",
+                    "sha512": "c25b66f19c6ab38250ecd56e1427192194b64c999f34fb8d22345df6a6d92a4abf4a70ad6071516694691fcf2b1a37b4332192cd9568438dcbe761bff6431498"
                 },
                 {
                     "type": "shell",
