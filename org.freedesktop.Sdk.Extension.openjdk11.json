@@ -1,8 +1,8 @@
 {
     "id": "org.freedesktop.Sdk.Extension.openjdk11",
-    "branch": "19.08",
+    "branch": "20.08beta",
     "runtime": "org.freedesktop.Sdk",
-    "runtime-version": "19.08",
+    "runtime-version": "20.08beta",
     "build-extension": true,
     "sdk": "org.freedesktop.Sdk",
     "separate-locales": false,
@@ -115,6 +115,18 @@
                     "commands": [
                         "chmod a+x configure"
                     ]
+                },
+                {
+                    "type": "patch",
+                    "path": "3660248422f4"
+                },
+                {
+                    "type": "patch",
+                    "path": "39020dd9b75f"
+                },
+                {
+                    "type": "patch",
+                    "path": "371bbe373ae0"
                 }
             ]
         },

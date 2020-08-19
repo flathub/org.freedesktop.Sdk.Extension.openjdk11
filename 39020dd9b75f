@@ -1,0 +1,50 @@
+
+# HG changeset patch
+# User ysuenaga
+# Date 1595335240 -32400
+# Node ID 39020dd9b75f6fc9cbd26724822bf58a0226da13
+# Parent  3660248422f43b4d670eda19fa53af3b7bcc8338
+8238386: (sctp) jdk.sctp/unix/native/libsctp/SctpNet.c "multiple definition" link errors with GCC10
+Summary: Fixed libsctp link errors caused by GCC10 default -fno-common
+Reviewed-by: chegar
+
+diff -r 3660248422f4 -r 39020dd9b75f src/jdk.sctp/unix/native/libsctp/Sctp.h
+--- a/src/jdk.sctp/unix/native/libsctp/Sctp.h	Tue Jul 21 21:38:13 2020 +0900
++++ b/src/jdk.sctp/unix/native/libsctp/Sctp.h	Tue Jul 21 21:40:40 2020 +0900
+@@ -322,12 +322,12 @@
+ 
+ #endif /* __linux__ */
+ 
+-sctp_getladdrs_func* nio_sctp_getladdrs;
+-sctp_freeladdrs_func* nio_sctp_freeladdrs;
+-sctp_getpaddrs_func* nio_sctp_getpaddrs;
+-sctp_freepaddrs_func* nio_sctp_freepaddrs;
+-sctp_bindx_func* nio_sctp_bindx;
+-sctp_peeloff_func* nio_sctp_peeloff;
++extern sctp_getladdrs_func* nio_sctp_getladdrs;
++extern sctp_freeladdrs_func* nio_sctp_freeladdrs;
++extern sctp_getpaddrs_func* nio_sctp_getpaddrs;
++extern sctp_freepaddrs_func* nio_sctp_freepaddrs;
++extern sctp_bindx_func* nio_sctp_bindx;
++extern sctp_peeloff_func* nio_sctp_peeloff;
+ 
+ jboolean loadSocketExtensionFuncs(JNIEnv* env);
+ 
+diff -r 3660248422f4 -r 39020dd9b75f src/jdk.sctp/unix/native/libsctp/SctpNet.c
+--- a/src/jdk.sctp/unix/native/libsctp/SctpNet.c	Tue Jul 21 21:38:13 2020 +0900
++++ b/src/jdk.sctp/unix/native/libsctp/SctpNet.c	Tue Jul 21 21:40:40 2020 +0900
+@@ -43,6 +43,13 @@
+ static const char* nativeSctpLib = "libsctp.so.1";
+ static jboolean funcsLoaded = JNI_FALSE;
+ 
++sctp_getladdrs_func* nio_sctp_getladdrs;
++sctp_freeladdrs_func* nio_sctp_freeladdrs;
++sctp_getpaddrs_func* nio_sctp_getpaddrs;
++sctp_freepaddrs_func* nio_sctp_freepaddrs;
++sctp_bindx_func* nio_sctp_bindx;
++sctp_peeloff_func* nio_sctp_peeloff;
++
+ JNIEXPORT jint JNICALL DEF_JNI_OnLoad
+   (JavaVM *vm, void *reserved) {
+     return JNI_VERSION_1_2;
+

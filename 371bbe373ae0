@@ -1,0 +1,35 @@
+
+# HG changeset patch
+# User ysuenaga
+# Date 1595335373 -32400
+# Node ID 371bbe373ae06d6c62878f9048f47d54faf06c8e
+# Parent  39020dd9b75f6fc9cbd26724822bf58a0226da13
+8238388: libj2gss/NativeFunc.o "multiple definition" link errors with GCC10
+Summary: Fixed libj2gss link errors caused by GCC10 default -fno-common
+Reviewed-by: weijun
+
+diff -r 39020dd9b75f -r 371bbe373ae0 src/java.security.jgss/share/native/libj2gss/NativeFunc.c
+--- a/src/java.security.jgss/share/native/libj2gss/NativeFunc.c	Tue Jul 21 21:40:40 2020 +0900
++++ b/src/java.security.jgss/share/native/libj2gss/NativeFunc.c	Tue Jul 21 21:42:53 2020 +0900
+@@ -27,6 +27,9 @@
+ #include <stdlib.h>
+ #include "NativeFunc.h"
+ 
++/* global GSS function table */
++GSS_FUNCTION_TABLE_PTR ftab;
++
+ /* standard GSS method names (ordering is from mapfile) */
+ static const char RELEASE_NAME[]                = "gss_release_name";
+ static const char IMPORT_NAME[]                 = "gss_import_name";
+diff -r 39020dd9b75f -r 371bbe373ae0 src/java.security.jgss/share/native/libj2gss/NativeFunc.h
+--- a/src/java.security.jgss/share/native/libj2gss/NativeFunc.h	Tue Jul 21 21:40:40 2020 +0900
++++ b/src/java.security.jgss/share/native/libj2gss/NativeFunc.h	Tue Jul 21 21:42:53 2020 +0900
+@@ -277,6 +277,6 @@
+ typedef GSS_FUNCTION_TABLE *GSS_FUNCTION_TABLE_PTR;
+ 
+ /* global GSS function table */
+-GSS_FUNCTION_TABLE_PTR ftab;
++extern GSS_FUNCTION_TABLE_PTR ftab;
+ 
+ #endif
+
