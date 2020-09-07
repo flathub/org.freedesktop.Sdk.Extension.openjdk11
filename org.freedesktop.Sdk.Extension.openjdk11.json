@@ -1,8 +1,8 @@
 {
     "id": "org.freedesktop.Sdk.Extension.openjdk11",
-    "branch": "19.08",
+    "branch": "20.08",
     "runtime": "org.freedesktop.Sdk",
-    "runtime-version": "19.08",
+    "runtime-version": "20.08",
     "build-extension": true,
     "sdk": "org.freedesktop.Sdk",
     "separate-locales": false,
@@ -102,13 +102,13 @@
                 "images"
             ],
             "post-install": [
-                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.7 openjdk-11)"
+                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.9 openjdk-11)"
             ],
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.7+10.tar.gz",
-                    "sha512": "c25b66f19c6ab38250ecd56e1427192194b64c999f34fb8d22345df6a6d92a4abf4a70ad6071516694691fcf2b1a37b4332192cd9568438dcbe761bff6431498"
+                    "url": "https://hg.openjdk.java.net/jdk-updates/jdk11u/archive/jdk-11.0.9+6.tar.gz",
+                    "sha256": "407c84367158aee7f54a9ebf46f519e381f1d20a886a6491aa8eedfd21a916ac"
                 },
                 {
                     "type": "shell",
