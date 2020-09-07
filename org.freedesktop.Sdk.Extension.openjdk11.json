@@ -102,13 +102,13 @@
                 "images"
             ],
             "post-install": [
-                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.7 openjdk-11)"
+                "(cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.8 openjdk-11)"
             ],
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.7+10.tar.gz",
-                    "sha512": "c25b66f19c6ab38250ecd56e1427192194b64c999f34fb8d22345df6a6d92a4abf4a70ad6071516694691fcf2b1a37b4332192cd9568438dcbe761bff6431498"
+                    "url": "https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.8+10.tar.gz",
+                    "sha512": "0f1e26910eace25ffe65b538280629eb9d44a2c0edec784b8e435babf37fe77901536230a7bf5c78c8056d0c366f38110b1d5215489f9d1e959972051fdf3fad"
                 },
                 {
                     "type": "shell",
