@@ -1,0 +1,179 @@
+---
+id: org.freedesktop.Sdk.Extension.openjdk11
+branch: '20.08'
+runtime: org.freedesktop.Sdk
+runtime-version: '20.08'
+build-extension: true
+sdk: org.freedesktop.Sdk
+separate-locales: false
+appstream-compose: false
+cleanup:
+  - /share/info
+  - /share/man
+build-options:
+  no-debuginfo: true
+  strip: true
+  prefix: /usr/lib/sdk/openjdk11
+  env:
+    V: '1'
+modules:
+  - name: bootstrap_jdk
+    buildsystem: simple
+    cleanup:
+      - '*'
+    sources:
+      - type: file
+        only-arches:
+          - i386
+        url: https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.5.10-0.fc29.i686.tar.bz2
+        dest-filename: java-openjdk.tar.bz2
+        sha512: aab122761b80f74207fa7b015e474f42521e91960cc8c0ffa442688343540fd636f0c5e3aef51012c257975d6b7d92fc1abfe7292ecfd312de1a4888d5736594
+      - type: file
+        only-arches:
+          - x86_64
+        url: https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.5.10-0.fc29.x86_64.tar.bz2
+        dest-filename: java-openjdk.tar.bz2
+        sha512: 65bbd1c7c5e37b578d9d8273dfeaeb367206b66dedc5ef46821d70ba19a2cf3b4189e3bdd9562bd55c0c1e2c008fe954066d5e425ba4e3b51c76f31a4fc61619
+      - type: file
+        only-arches:
+          - arm
+        url: https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.5.10-0.fc29.armv7hl.tar.bz2
+        dest-filename: java-openjdk.tar.bz2
+        sha512: 760a20608e8f4aa103ba525104b21e982e4a16176e8a8a18a1a2d36059f767887f0a0bc2d4f46ad8ed638af267a2a9b41f007313c9066599fb156c148ab754a4
+      - type: file
+        only-arches:
+          - aarch64
+        url: https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.5.10-0.fc29.aarch64.tar.bz2
+        dest-filename: java-openjdk.tar.bz2
+        sha512: 36352df2104d50ac93d6279e121734657bcf85ffbab9593ece2342dbb12b8a7648fadc438be0b6e547d77010e249e89cf4ffc8be68372807d4c935c1a9addcfe
+    build-commands:
+      - mkdir -p $FLATPAK_DEST/bootstrap-java
+      - tar xf java-openjdk.tar.bz2 --strip-components=4 --directory=$FLATPAK_DEST/bootstrap-java
+  - name: java
+    buildsystem: autotools
+    no-parallel-make: true
+    config-opts:
+      - --with-boot-jdk=/usr/lib/sdk/openjdk11/bootstrap-java
+      - --with-jvm-variants=server
+      - --with-version-build=10
+      - --with-version-pre=
+      - --with-version-opt=
+      - --with-vendor-version-string=18.9
+      - --with-vendor-name=Flathub
+      - --with-vendor-url=https://flathub.org
+      - --with-debug-level=release
+      - --with-native-debug-symbols=internal
+      - --enable-unlimited-crypto
+      - --with-zlib=system
+      - --with-libjpeg=system
+      - --with-giflib=system
+      - --with-libpng=system
+      - --with-lcms=system
+      - --with-stdc++lib=dynamic
+      - --with-extra-cxxflags=-O2 -g -Wno-error -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse
+      - --with-extra-cflags=-O2 -g -fstack-protector-strong -Wno-error -fno-delete-null-pointer-checks -fno-lifetime-dse -fpermissive
+      - --with-extra-ldflags=-Wl,-z,relro -Wl,-z,now
+      - --disable-javac-server
+      - --disable-warnings-as-errors
+    make-args:
+      - JAVAC_FLAGS=-g
+      - LOG=trace
+      - WARNINGS_ARE_ERRORS=-Wno-error
+      - CFLAGS_WARNINGS_ARE_ERRORS=-Wno-error
+      - images
+    post-install:
+      - (cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.8 openjdk-11)
+    sources:
+      - type: archive
+        url: https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.8+10.tar.gz
+        sha512: 0f1e26910eace25ffe65b538280629eb9d44a2c0edec784b8e435babf37fe77901536230a7bf5c78c8056d0c366f38110b1d5215489f9d1e959972051fdf3fad
+      - type: shell
+        commands:
+          - chmod a+x configure
+      - type: patch
+        path: 3660248422f4
+      - type: patch
+        path: 39020dd9b75f
+      - type: patch
+        path: 371bbe373ae0
+  - name: cacerts
+    buildsystem: simple
+    sources:
+      - type: file
+        path: extract_cacerts.sh
+    build-commands:
+      - ./extract_cacerts.sh /usr/lib/sdk/openjdk11/jvm/openjdk-11
+  - name: ant
+    buildsystem: simple
+    cleanup:
+      - '*.bat'
+      - '*.cmd'
+    sources:
+      - type: file
+        url: http://archive.apache.org/dist/ant/binaries/apache-ant-1.10.8-bin.tar.gz
+        dest-filename: apache-ant-bin.tar.gz
+        sha512: 4d80dc6ba23eeec7769085ddb00261b7480b596b56c6e69aa221391acbfb7338eb5855179c88222c8021095ef1f64f43caf2b4f90e8305d7c3128026d4258d06
+    build-commands:
+      - mkdir -p $FLATPAK_DEST/ant
+      - tar xf apache-ant-bin.tar.gz --strip-components=1 --directory=$FLATPAK_DEST/ant
+      - ln -s $FLATPAK_DEST/ant/bin/ant $FLATPAK_DEST/bin
+  - name: maven
+    buildsystem: simple
+    cleanup:
+      - '*.bat'
+      - '*.cmd'
+    sources:
+      - type: file
+        url: http://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+        dest-filename: apache-maven-bin.tar.gz
+        sha512: c35a1803a6e70a126e80b2b3ae33eed961f83ed74d18fcd16909b2d44d7dada3203f1ffe726c17ef8dcca2dcaa9fca676987befeadc9b9f759967a8cb77181c0
+    build-commands:
+      - mkdir -p $FLATPAK_DEST/maven
+      - tar xf apache-maven-bin.tar.gz --strip-components=1 --exclude=jansi-native --directory=$FLATPAK_DEST/maven
+      - ln -s $FLATPAK_DEST/maven/bin/mvn $FLATPAK_DEST/maven/bin/mvnDebug $FLATPAK_DEST/bin
+  - name: gradle
+    buildsystem: simple
+    cleanup:
+      - '*.bat'
+    sources:
+      - type: file
+        url: https://services.gradle.org/distributions/gradle-6.3-bin.zip
+        dest-filename: gradle-bin.zip
+        sha256: 038794feef1f4745c6347107b6726279d1c824f3fc634b60f86ace1e9fbd1768
+    build-commands:
+      - unzip -q gradle-bin.zip -d $FLATPAK_DEST
+      - mv $FLATPAK_DEST/gradle-* $FLATPAK_DEST/gradle
+      - ln -s $FLATPAK_DEST/gradle/bin/gradle $FLATPAK_DEST/bin
+  - name: scripts
+    buildsystem: simple
+    sources:
+      - type: script
+        commands:
+          - mkdir -p /app/jre/bin
+          - cd /usr/lib/sdk/openjdk11/jvm/openjdk-11
+          - cp -ra conf lib release /app/jre/
+          - rm /app/jre/lib/src.zip /app/jre/lib/ct.sym
+          - cp -ra bin/{java,jjs,keytool,pack200,rmid,rmiregistry,unpack200} /app/jre/bin
+        dest-filename: install.sh
+      - type: script
+        commands:
+          - mkdir -p /app/jdk/
+          - cd /usr/lib/sdk/openjdk11/jvm/openjdk-11
+          - cp -ra bin conf include jmods lib release /app/jdk/
+        dest-filename: installjdk.sh
+      - type: script
+        commands:
+          - export JAVA_HOME=/usr/lib/sdk/openjdk11/jvm/openjdk-11
+          - export PATH=$PATH:/usr/lib/sdk/openjdk11/bin
+        dest-filename: enable.sh
+    build-commands:
+      - cp enable.sh install.sh installjdk.sh /usr/lib/sdk/openjdk11/
+  - name: appdata
+    buildsystem: simple
+    sources:
+      - type: file
+        path: org.freedesktop.Sdk.Extension.openjdk11.appdata.xml
+    build-commands:
+      - mkdir -p ${FLATPAK_DEST}/share/metainfo
+      - cp org.freedesktop.Sdk.Extension.openjdk11.appdata.xml ${FLATPAK_DEST}/share/metainfo
+      - appstream-compose --basename=org.freedesktop.Sdk.Extension.openjdk11 --prefix=${FLATPAK_DEST} --origin=flatpak org.freedesktop.Sdk.Extension.openjdk11
