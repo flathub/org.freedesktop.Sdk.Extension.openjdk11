@@ -96,6 +96,9 @@ modules:
         path: 39020dd9b75f
       - type: patch
         path: 371bbe373ae0
+      - type: patch
+        # https://github.com/flathub/org.freedesktop.Sdk.Extension.openjdk11/issues/15
+        path: java_desktop_xdg_open.patch
   - name: cacerts
     buildsystem: simple
     sources:
