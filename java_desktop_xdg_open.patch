@@ -1,0 +1,50 @@
+--- a/src/java.desktop/unix/classes/sun/awt/X11/XDesktopPeer.java	2021-01-16 18:10:28.246735459 -0400
++++ b/src/java.desktop/unix/classes/sun/awt/X11/XDesktopPeer.java	2021-01-16 22:12:54.371818460 -0400
+@@ -59,8 +59,7 @@
+         XToolkit.awtLock();
+         try {
+             if (!initExecuted) {
+-                nativeLibraryLoaded = init(UNIXToolkit.getEnabledGtkVersion()
+-                        .getNumber(), UNIXToolkit.isGtkVerbose());
++                nativeLibraryLoaded = false;
+             }
+         } finally {
+             initExecuted = true;
+@@ -75,7 +74,7 @@
+ 
+     static boolean isDesktopSupported() {
+         initWithLock();
+-        return nativeLibraryLoaded && !supportedActions.isEmpty();
++        return /*nativeLibraryLoaded &&*/ !supportedActions.isEmpty();
+     }
+ 
+     public boolean isSupported(Action type) {
+@@ -109,22 +108,19 @@
+     }
+ 
+     private void launch(URI uri) throws IOException {
+-        byte[] uriByteArray = ( uri.toString() + '\0' ).getBytes();
+         boolean result = false;
++        int ret = -1;
+         XToolkit.awtLock();
+         try {
+-            if (!nativeLibraryLoaded) {
+-                throw new IOException("Failed to load native libraries.");
+-            }
+-            result = gnome_url_show(uriByteArray);
++            ret = Runtime.getRuntime().exec(new String[] {"xdg-open", uri.toString()}).waitFor();
++            result = ret == 0;
++        } catch (InterruptedException e) {
++            System.err.println("Caught InterruptedException: " + e.getMessage());
+         } finally {
+             XToolkit.awtUnlock();
+         }
+         if (!result) {
+-            throw new IOException("Failed to show URI:" + uri);
++            throw new IOException("xdg-open failed with error code "+ ret +" for URI: " + uri);
+         }
+     }
+-
+-    private native boolean gnome_url_show(byte[] url);
+-    private static native boolean init(int gtkVersion, boolean verbose);
+ }
