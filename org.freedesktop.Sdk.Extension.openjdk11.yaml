@@ -55,7 +55,7 @@ modules:
     config-opts:
       - --with-boot-jdk=/usr/lib/sdk/openjdk11/bootstrap-java
       - --with-jvm-variants=server
-      - --with-version-build=10
+      - --with-version-build=9
       - --with-version-pre=
       - --with-version-opt=
       - --with-vendor-version-string=18.9
@@ -73,6 +73,7 @@ modules:
       - --with-extra-cxxflags=-O2 -g -Wno-error -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse
       - --with-extra-cflags=-O2 -g -fstack-protector-strong -Wno-error -fno-delete-null-pointer-checks -fno-lifetime-dse -fpermissive
       - --with-extra-ldflags=-Wl,-z,relro -Wl,-z,now
+      - --with-jvm-features=shenandoahgc
       - --disable-javac-server
       - --disable-warnings-as-errors
     make-args:
@@ -82,20 +83,14 @@ modules:
       - CFLAGS_WARNINGS_ARE_ERRORS=-Wno-error
       - images
     post-install:
-      - (cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.8 openjdk-11)
+      - (cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.11 openjdk-11)
     sources:
       - type: archive
-        url: https://hg.openjdk.java.net/shenandoah/jdk11/archive/shenandoah-jdk-11.0.8+10.tar.gz
-        sha512: 0f1e26910eace25ffe65b538280629eb9d44a2c0edec784b8e435babf37fe77901536230a7bf5c78c8056d0c366f38110b1d5215489f9d1e959972051fdf3fad
+        url: https://github.com/openjdk/jdk11u/archive/refs/tags/jdk-11.0.11+9.tar.gz
+        sha512: ea8653d94a277202a5c10645e7e5d0a50829deb1b2bb690e836c32621454e01e47f28485c0a58b9b60566dda075115d287cfb9b3a67710a5ccf671f84926dca8
       - type: shell
         commands:
           - chmod a+x configure
-      - type: patch
-        path: 3660248422f4
-      - type: patch
-        path: 39020dd9b75f
-      - type: patch
-        path: 371bbe373ae0
   - name: cacerts
     buildsystem: simple
     sources:
@@ -110,9 +105,9 @@ modules:
       - '*.cmd'
     sources:
       - type: file
-        url: http://archive.apache.org/dist/ant/binaries/apache-ant-1.10.8-bin.tar.gz
+        url: http://archive.apache.org/dist/ant/binaries/apache-ant-1.10.10-bin.tar.gz
         dest-filename: apache-ant-bin.tar.gz
-        sha512: 4d80dc6ba23eeec7769085ddb00261b7480b596b56c6e69aa221391acbfb7338eb5855179c88222c8021095ef1f64f43caf2b4f90e8305d7c3128026d4258d06
+        sha512: ee6c25aeb810e7d01c271352a65303ad9a0c5107b9ea832b8ead5b436c6f8a11a9e34fa582702e93545d0e9e3f86d45f7dc6906a77d1a79bf3860cf4850147c7
     build-commands:
       - mkdir -p $FLATPAK_DEST/ant
       - tar xf apache-ant-bin.tar.gz --strip-components=1 --directory=$FLATPAK_DEST/ant
@@ -124,9 +119,9 @@ modules:
       - '*.cmd'
     sources:
       - type: file
-        url: http://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+        url: http://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz
         dest-filename: apache-maven-bin.tar.gz
-        sha512: c35a1803a6e70a126e80b2b3ae33eed961f83ed74d18fcd16909b2d44d7dada3203f1ffe726c17ef8dcca2dcaa9fca676987befeadc9b9f759967a8cb77181c0
+        sha512: 0ec48eb515d93f8515d4abe465570dfded6fa13a3ceb9aab8031428442d9912ec20f066b2afbf56964ffe1ceb56f80321b50db73cf77a0e2445ad0211fb8e38d
     build-commands:
       - mkdir -p $FLATPAK_DEST/maven
       - tar xf apache-maven-bin.tar.gz --strip-components=1 --exclude=jansi-native --directory=$FLATPAK_DEST/maven
