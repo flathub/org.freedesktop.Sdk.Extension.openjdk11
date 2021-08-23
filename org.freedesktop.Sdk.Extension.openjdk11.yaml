@@ -1,8 +1,8 @@
 ---
 id: org.freedesktop.Sdk.Extension.openjdk11
-branch: '20.08'
+branch: '21.08'
 runtime: org.freedesktop.Sdk
-runtime-version: '20.08'
+runtime-version: '21.08'
 build-extension: true
 sdk: org.freedesktop.Sdk
 separate-locales: false
@@ -22,12 +22,6 @@ modules:
     cleanup:
       - '*'
     sources:
-      - type: file
-        only-arches:
-          - i386
-        url: https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.5.10-0.fc29.i686.tar.bz2
-        dest-filename: java-openjdk.tar.bz2
-        sha512: aab122761b80f74207fa7b015e474f42521e91960cc8c0ffa442688343540fd636f0c5e3aef51012c257975d6b7d92fc1abfe7292ecfd312de1a4888d5736594
       - type: file
         only-arches:
           - x86_64
