@@ -49,7 +49,7 @@ modules:
     config-opts:
       - --with-boot-jdk=/usr/lib/sdk/openjdk11/bootstrap-java
       - --with-jvm-variants=server
-      - --with-version-build=7
+      - --with-version-build=8
       - --with-version-pre=
       - --with-version-opt=
       - --with-vendor-version-string=18.9
@@ -78,11 +78,11 @@ modules:
       - CFLAGS_WARNINGS_ARE_ERRORS=-Wno-error
       - images
     post-install:
-      - (cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.12 openjdk-11)
+      - (cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.14 openjdk-11)
     sources:
       - type: archive
-        url: https://github.com/openjdk/jdk11u/archive/refs/tags/jdk-11.0.12+7.tar.gz
-        sha512: 123cad1dbb97b61a559d255f3bb1f2e9ea21b6e319a06d0b872dd300565836a0c7643bb876ce603de0749788242bbf89f687d7b762408ab7a2a672c4895fe1f9
+        url: https://github.com/openjdk/jdk11u/archive/refs/tags/jdk-11.0.14+8.tar.gz
+        sha512: 2c98ce188669410a2a4ef9ff577c4127c0f138115e2cb09ffdfe25ca5c25f2933c600018aca0b13817ed33c865fd7a1af6fb355e7dd1d1ff4eb828bf016c4b4c
       - type: shell
         commands:
           - chmod a+x configure
@@ -100,9 +100,9 @@ modules:
       - '*.cmd'
     sources:
       - type: file
-        url: http://archive.apache.org/dist/ant/binaries/apache-ant-1.10.10-bin.tar.gz
+        url: http://archive.apache.org/dist/ant/binaries/apache-ant-1.10.12-bin.tar.gz
         dest-filename: apache-ant-bin.tar.gz
-        sha512: ee6c25aeb810e7d01c271352a65303ad9a0c5107b9ea832b8ead5b436c6f8a11a9e34fa582702e93545d0e9e3f86d45f7dc6906a77d1a79bf3860cf4850147c7
+        sha512: 2287dc5cfc21043c14e5413f9afb1c87c9f266ec2a9ba2d3bf2285446f6e4ccb59b558bf2e5c57911a05dfa293c7d5c7ad60ac9f744ba11406f4e6f9a27b2403
     build-commands:
       - mkdir -p $FLATPAK_DEST/ant
       - tar xf apache-ant-bin.tar.gz --strip-components=1 --directory=$FLATPAK_DEST/ant
@@ -114,9 +114,9 @@ modules:
       - '*.cmd'
     sources:
       - type: file
-        url: http://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz
+        url: http://archive.apache.org/dist/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz
         dest-filename: apache-maven-bin.tar.gz
-        sha512: 0ec48eb515d93f8515d4abe465570dfded6fa13a3ceb9aab8031428442d9912ec20f066b2afbf56964ffe1ceb56f80321b50db73cf77a0e2445ad0211fb8e38d
+        sha512: a9b2d825eacf2e771ed5d6b0e01398589ac1bfa4171f36154d1b5787879605507802f699da6f7cfc80732a5282fd31b28e4cd6052338cbef0fa1358b48a5e3c8
     build-commands:
       - mkdir -p $FLATPAK_DEST/maven
       - tar xf apache-maven-bin.tar.gz --strip-components=1 --exclude=jansi-native --directory=$FLATPAK_DEST/maven
