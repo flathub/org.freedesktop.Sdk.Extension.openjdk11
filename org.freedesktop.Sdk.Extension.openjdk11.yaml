@@ -78,11 +78,11 @@ modules:
       - CFLAGS_WARNINGS_ARE_ERRORS=-Wno-error
       - images
     post-install:
-      - (cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.14 openjdk-11)
+      - (cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.16.1 openjdk-11)
     sources:
       - type: archive
-        url: https://github.com/openjdk/jdk11u/archive/refs/tags/jdk-11.0.14+8.tar.gz
-        sha512: 2c98ce188669410a2a4ef9ff577c4127c0f138115e2cb09ffdfe25ca5c25f2933c600018aca0b13817ed33c865fd7a1af6fb355e7dd1d1ff4eb828bf016c4b4c
+        url: https://github.com/openjdk/jdk11u/archive/refs/tags/jdk-11.0.16.1+1.tar.gz
+        sha512: ccc27317d8440bfa9886297f8186978022351c1eddb5ecefcc53d8b0c3bda048018d5cedf2b725179d6568e40db029e9b39b0e91d9e12bb1277091403b5f2cea
       - type: shell
         commands:
           - chmod a+x configure
