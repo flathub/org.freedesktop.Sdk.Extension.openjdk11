@@ -127,9 +127,9 @@ modules:
       - '*.bat'
     sources:
       - type: file
-        url: https://services.gradle.org/distributions/gradle-7.3-bin.zip
+        url: https://services.gradle.org/distributions/gradle-7.3.3-bin.zip
         dest-filename: gradle-bin.zip
-        sha256: de8f52ad49bdc759164f72439a3bf56ddb1589c4cde802d3cec7d6ad0e0ee410
+        sha256: b586e04868a22fd817c8971330fec37e298f3242eb85c374181b12d637f80302
     build-commands:
       - unzip -q gradle-bin.zip -d $FLATPAK_DEST
       - mv $FLATPAK_DEST/gradle-* $FLATPAK_DEST/gradle
