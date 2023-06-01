@@ -49,7 +49,7 @@ modules:
     config-opts:
       - --with-boot-jdk=/usr/lib/sdk/openjdk11/bootstrap-java
       - --with-jvm-variants=server
-      - --with-version-build=10
+      - --with-version-build=7
       - --with-version-pre=
       - --with-version-opt=
       - --with-vendor-version-string=18.9
@@ -78,11 +78,11 @@ modules:
       - CFLAGS_WARNINGS_ARE_ERRORS=-Wno-error
       - images
     post-install:
-      - (cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.18 openjdk-11)
+      - (cd /usr/lib/sdk/openjdk11/jvm && ln -s openjdk-11.0.19 openjdk-11)
     sources:
       - type: archive
-        url: https://github.com/openjdk/jdk11u/archive/refs/tags/jdk-11.0.18+10.tar.gz
-        sha512: 50730eb9eaadf0d60cb3bfc105e4628ee868f25db840ecbe6b259579b236a34b1dff1def381a61f02beac30b89f67b0eddc42347b2f95b2c7803c7b1b5af8306
+        url: https://github.com/openjdk/jdk11u/archive/refs/tags/jdk-11.0.19+7.tar.gz
+        sha512: 6858aac76becbebb5e35f7ec28f495187b262f5a8abd31eb84eb3a5ca4abfff6c373c502082eba55340776bc83dc134ca9005686f4a5004938e05f90210cdd8e
       - type: shell
         commands:
           - chmod a+x configure
