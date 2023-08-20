@@ -25,18 +25,18 @@ modules:
       - type: file
         only-arches:
           - x86_64
-        url: https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.5.10-0.fc29.x86_64.tar.bz2
-        dest-filename: java-openjdk.tar.bz2
-        sha512: 65bbd1c7c5e37b578d9d8273dfeaeb367206b66dedc5ef46821d70ba19a2cf3b4189e3bdd9562bd55c0c1e2c008fe954066d5e425ba4e3b51c76f31a4fc61619
+        url: https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.20.1+1/OpenJDK11U-jdk_x64_linux_hotspot_11.0.20.1_1.tar.gz
+        dest-filename: java-openjdk.tar.gz
+        sha256: 398a64bff002f0e3b0c01ecd24a1a32c83cb72a5255344219e9757d4ddd9f857
       - type: file
         only-arches:
           - aarch64
-        url: https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.5.10-0.fc29.aarch64.tar.bz2
-        dest-filename: java-openjdk.tar.bz2
-        sha512: 36352df2104d50ac93d6279e121734657bcf85ffbab9593ece2342dbb12b8a7648fadc438be0b6e547d77010e249e89cf4ffc8be68372807d4c935c1a9addcfe
+        url: https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.20.1+1/OpenJDK11U-jdk_aarch64_linux_hotspot_11.0.20.1_1.tar.gz
+        dest-filename: java-openjdk.tar.gz
+        sha256: 69d39682c4a2fac294a9eaacbf62c26d3c8a2f9123f1b5d287498a5472c6b672
     build-commands:
       - mkdir -p $FLATPAK_DEST/bootstrap-java
-      - tar xf java-openjdk.tar.bz2 --strip-components=4 --directory=$FLATPAK_DEST/bootstrap-java
+      - tar xf java-openjdk.tar.gz --strip-components=1 --directory=$FLATPAK_DEST/bootstrap-java
   - name: java
     buildsystem: autotools
     no-parallel-make: true
