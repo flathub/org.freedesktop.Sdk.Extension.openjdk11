@@ -1,8 +1,8 @@
 ---
 id: org.freedesktop.Sdk.Extension.openjdk11
-branch: '22.08'
+branch: '23.08'
 runtime: org.freedesktop.Sdk
-runtime-version: '22.08'
+runtime-version: '23.08'
 build-extension: true
 sdk: org.freedesktop.Sdk
 separate-locales: false
@@ -28,12 +28,6 @@ modules:
         url: https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.5.10-0.fc29.x86_64.tar.bz2
         dest-filename: java-openjdk.tar.bz2
         sha512: 65bbd1c7c5e37b578d9d8273dfeaeb367206b66dedc5ef46821d70ba19a2cf3b4189e3bdd9562bd55c0c1e2c008fe954066d5e425ba4e3b51c76f31a4fc61619
-      - type: file
-        only-arches:
-          - arm
-        url: https://fedorapeople.org/~mbooth/bootstrap_jdk/bootstrap-openjdk-11.0.5.10-0.fc29.armv7hl.tar.bz2
-        dest-filename: java-openjdk.tar.bz2
-        sha512: 760a20608e8f4aa103ba525104b21e982e4a16176e8a8a18a1a2d36059f767887f0a0bc2d4f46ad8ed638af267a2a9b41f007313c9066599fb156c148ab754a4
       - type: file
         only-arches:
           - aarch64
