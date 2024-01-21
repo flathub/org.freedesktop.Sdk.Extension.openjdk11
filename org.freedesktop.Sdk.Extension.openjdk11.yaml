@@ -80,8 +80,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/adoptium/jdk11u.git
-        tag: jdk-11.0.21+9
-        commit: a046767fe01a2d02ec81dcba2bd0a43e435dc709
+        tag: jdk-11.0.22+7
+        commit: 6739881b2fa7e8e8c05198bc7d5d4834638bd7d1
         x-checker-data:
           type: json
           url: https://api.github.com/repos/adoptium/temurin11-binaries/releases/latest
@@ -127,9 +127,9 @@ modules:
       - '*.cmd'
     sources:
       - type: file
-        url: http://archive.apache.org/dist/maven/maven-3/3.8.7/binaries/apache-maven-3.8.7-bin.tar.gz
+        url: http://archive.apache.org/dist/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz
         dest-filename: apache-maven-bin.tar.gz
-        sha512: 21c2be0a180a326353e8f6d12289f74bc7cd53080305f05358936f3a1b6dd4d91203f4cc799e81761cf5c53c5bbe9dcc13bdb27ec8f57ecf21b2f9ceec3c8d27
+        sha512: 332088670d14fa9ff346e6858ca0acca304666596fec86eea89253bd496d3c90deae2be5091be199f48e09d46cec817c6419d5161fb4ee37871503f472765d00
         x-checker-data:
           type: anitya
           project-id: 1894
@@ -148,9 +148,9 @@ modules:
       - '*.bat'
     sources:
       - type: file
-        url: https://services.gradle.org/distributions/gradle-8.3-bin.zip
+        url: https://services.gradle.org/distributions/gradle-8.5-bin.zip
         dest-filename: gradle-bin.zip
-        sha256: 591855b517fc635b9e04de1d05d5e76ada3f89f5fc76f87978d1b245b4f69225
+        sha256: 9d926787066a081739e8200858338b4a69e837c3a821a33aca9db09dd4a41026
         x-checker-data:
           type: json
           url: https://services.gradle.org/versions/current
