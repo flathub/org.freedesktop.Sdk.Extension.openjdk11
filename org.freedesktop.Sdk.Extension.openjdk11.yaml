@@ -74,8 +74,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/adoptium/jdk11u.git
-        tag: jdk-11.0.23+9
-        commit: 7a356988b167292b90af5a2b8586c06351519215
+        tag: jdk-11.0.24+8
+        commit: ff537af466ee74e914c5cee1042de650bfe0da5f
         x-checker-data:
           type: json
           url: https://api.github.com/repos/adoptium/temurin11-binaries/releases/latest
@@ -142,9 +142,9 @@ modules:
       - '*.bat'
     sources:
       - type: file
-        url: https://services.gradle.org/distributions/gradle-8.7-bin.zip
+        url: https://services.gradle.org/distributions/gradle-8.9-bin.zip
         dest-filename: gradle-bin.zip
-        sha256: 544c35d6bd849ae8a5ed0bcea39ba677dc40f49df7d1835561582da2009b961d
+        sha256: d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab
         x-checker-data:
           type: json
           url: https://services.gradle.org/versions/current
