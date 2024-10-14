@@ -4,7 +4,7 @@ This extension contains the OpenJDK 11 Java Runtime Environment (JRE) and Java D
 
 OpenJDK 11 is the previous long-term support (LTS) version.
 
-For the current LTS version, see the [OpenJDK 17](https://github.com/flathub/org.freedesktop.Sdk.Extension.openjdk17) extension.
+For the current LTS version, see the [OpenJDK 21](https://github.com/flathub/org.freedesktop.Sdk.Extension.openjdk21) extension.
 
 For the current latest (non-LTS) version, see the [OpenJDK](https://github.com/flathub/org.freedesktop.Sdk.Extension.openjdk) extension.
 
