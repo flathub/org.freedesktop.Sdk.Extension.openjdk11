@@ -91,7 +91,9 @@ modules:
           is-main-source: true
           tag-query: .tag_name
       - type: patch
-        path: java-remove-version-build.patch
+        paths:
+          - java-remove-version-build.patch
+          - remove-ccache-wrapper-check.patch
       - type: shell
         commands:
           - chmod a+x configure
