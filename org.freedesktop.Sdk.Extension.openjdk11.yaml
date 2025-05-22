@@ -72,6 +72,7 @@ modules:
       - --with-jvm-features=shenandoahgc
       - --disable-javac-server
       - --disable-warnings-as-errors
+      - --disable-ccache
     make-args:
       - JAVAC_FLAGS=-g
       - LOG=trace
