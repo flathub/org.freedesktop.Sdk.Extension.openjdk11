@@ -1,0 +1,19 @@
+diff --git a/make/autoconf/toolchain.m4 b/make/autoconf/toolchain.m4
+index 24151ad49..97bfb8b8e 100644
+--- a/make/autoconf/toolchain.m4
++++ b/make/autoconf/toolchain.m4
+@@ -556,14 +556,6 @@ AC_DEFUN([TOOLCHAIN_FIND_COMPILER],
+     AC_MSG_RESULT([no symlink])
+   else
+     AC_MSG_RESULT([$SYMLINK_ORIGINAL])
+-
+-    # We can't handle ccache by gcc wrappers, since we need to know if we're
+-    # using ccache. Instead ccache usage must be controlled by a configure option.
+-    COMPILER_BASENAME=`$BASENAME "$SYMLINK_ORIGINAL"`
+-    if test "x$COMPILER_BASENAME" = "xccache"; then
+-      AC_MSG_NOTICE([Please use --enable-ccache instead of providing a wrapped compiler.])
+-      AC_MSG_ERROR([$TEST_COMPILER is a symbolic link to ccache. This is not supported.])
+-    fi
+   fi
+ 
+   TOOLCHAIN_EXTRACT_COMPILER_VERSION([$1], [$COMPILER_NAME])
