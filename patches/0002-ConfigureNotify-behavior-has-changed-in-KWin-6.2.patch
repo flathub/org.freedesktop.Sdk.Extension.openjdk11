@@ -1,0 +1,44 @@
+From 4ede9a429e71ee29982b4600b9bebb7004efcb22 Mon Sep 17 00:00:00 2001
+From: guihkx <626206+guihkx@users.noreply.github.com>
+Date: Tue, 15 Jul 2025 14:52:59 -0300
+Subject: [PATCH] ConfigureNotify behavior has changed in KWin 6.2
+
+This fixes incorrectly positioned and disappearing context menus in KWin
+6.2+. This should not negatively impact older KWin versions.
+
+This fix was tested on Plasma versions 5.27.5 and 6.4.2, on both X11 and
+Wayland (through XWayland) sessions, by running jExifToolGUI 2.0.2 [1]
+(built with Java 11), and then verifying that the behavior of drop down
+menus is correct and consistent in both Plasma versions.
+
+Steps taken:
+
+1. Open jExifToolGUI
+2. Maximize the window
+3. Left click on the "File" menu
+4. Verify that the menu created does not disappear when you release the
+   left mouse button
+
+Bug: https://bugs.openjdk.org/browse/JDK-8338751
+Backport-of: https://github.com/openjdk/jdk/commit/3da68900818fc43b777098fe6e244779794d5294
+
+[1] https://flathub.org/apps/io.github.hvdwofl.jExifToolGUI
+---
+ src/java.desktop/unix/classes/sun/awt/X11/XWindowPeer.java | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/java.desktop/unix/classes/sun/awt/X11/XWindowPeer.java b/src/java.desktop/unix/classes/sun/awt/X11/XWindowPeer.java
+index 010e934be2..d506e8f443 100644
+--- a/src/java.desktop/unix/classes/sun/awt/X11/XWindowPeer.java
++++ b/src/java.desktop/unix/classes/sun/awt/X11/XWindowPeer.java
+@@ -772,6 +772,7 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
+             // TODO this should be the default for every case.
+             switch (runningWM) {
+                 case XWM.CDE_WM:
++                case XWM.KDE2_WM:
+                 case XWM.MOTIF_WM:
+                 case XWM.METACITY_WM:
+                 case XWM.MUTTER_WM:
+-- 
+2.50.1
+
