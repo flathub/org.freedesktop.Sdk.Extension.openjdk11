@@ -92,7 +92,8 @@ modules:
           is-main-source: true
           tag-query: .tag_name
       - type: patch
-        path: java-remove-version-build.patch
+        paths:
+          - patches/java-remove-version-build.patch
       - type: shell
         commands:
           - chmod a+x configure
