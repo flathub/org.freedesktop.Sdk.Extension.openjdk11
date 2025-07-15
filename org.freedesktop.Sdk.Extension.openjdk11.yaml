@@ -93,6 +93,7 @@ modules:
       - type: patch
         paths:
           - patches/java-remove-version-build.patch
+          - patches/0001-Allow-ccache-to-be-handled-by-GCC-wrappers.patch
       - type: shell
         commands:
           - chmod a+x configure
