@@ -95,6 +95,7 @@ modules:
         paths:
           - patches/java-remove-version-build.patch
           - patches/0001-Allow-ccache-to-be-handled-by-GCC-wrappers.patch
+          - patches/0002-ConfigureNotify-behavior-has-changed-in-KWin-6.2.patch
       - type: shell
         commands:
           - chmod a+x configure
