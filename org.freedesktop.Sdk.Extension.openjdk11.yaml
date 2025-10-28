@@ -23,9 +23,9 @@ modules:
       - type: file
         only-arches:
           - x86_64
-        url: https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.28%2B6/OpenJDK11U-jdk_x64_linux_hotspot_11.0.28_6.tar.gz
+        url: https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.29%2B7/OpenJDK11U-jdk_x64_linux_hotspot_11.0.29_7.tar.gz
         dest-filename: java-openjdk.tar.gz
-        sha256: 7dfd551795a8884b26cbb02e0301da95db40160bb194f48271dc2ef9367f50c2
+        sha256: 3c8f2b53dd137cd86e54f40df96fd0fc56df72c749c06469e7eab216503bc7cf
         x-checker-data:
           type: json
           url: https://api.github.com/repos/adoptium/temurin11-binaries/releases/latest
@@ -83,8 +83,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/adoptium/jdk11u.git
-        tag: jdk-11.0.28+6
-        commit: 141d7af9cd3c41de974c3d3f8017d6b21dc6d36c
+        tag: jdk-11.0.29+7
+        commit: d3b1c2be9e87aad07cac29d94679130fe5807c17
         x-checker-data:
           type: json
           url: https://api.github.com/repos/adoptium/temurin11-binaries/releases/latest
@@ -155,9 +155,9 @@ modules:
       - '*.bat'
     sources:
       - type: file
-        url: https://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+        url: https://services.gradle.org/distributions/gradle-9.1.0-bin.zip
         dest-filename: gradle-bin.zip
-        sha256: bd71102213493060956ec229d946beee57158dbd89d0e62b91bca0fa2c5f3531
+        sha256: a17ddd85a26b6a7f5ddb71ff8b05fc5104c0202c6e64782429790c933686c806
         x-checker-data:
           type: json
           url: https://services.gradle.org/versions/current
