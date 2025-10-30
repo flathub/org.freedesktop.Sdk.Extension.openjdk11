@@ -23,9 +23,9 @@ modules:
       - type: file
         only-arches:
           - x86_64
-        url: https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.28%2B6/OpenJDK11U-jdk_x64_linux_hotspot_11.0.28_6.tar.gz
+        url: https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.29%2B7/OpenJDK11U-jdk_x64_linux_hotspot_11.0.29_7.tar.gz
         dest-filename: java-openjdk.tar.gz
-        sha256: 7dfd551795a8884b26cbb02e0301da95db40160bb194f48271dc2ef9367f50c2
+        sha256: 3c8f2b53dd137cd86e54f40df96fd0fc56df72c749c06469e7eab216503bc7cf
         x-checker-data:
           type: json
           url: https://api.github.com/repos/adoptium/temurin11-binaries/releases/latest
@@ -34,9 +34,9 @@ modules:
       - type: file
         only-arches:
           - aarch64
-        url: https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.28%2B6/OpenJDK11U-jdk_aarch64_linux_hotspot_11.0.28_6.tar.gz
+        url: https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.29%2B7/OpenJDK11U-jdk_aarch64_linux_hotspot_11.0.29_7.tar.gz
         dest-filename: java-openjdk.tar.gz
-        sha256: 32c316cb3998a9c9dee2829fbb577ea1c0ed666700cec73e049d44c342bb19af
+        sha256: 71e00cd0ab4371a4e9d67d1a2ca3e8ed2f126dff6a6ab152a6ecdec60100fbdd
         x-checker-data:
           type: json
           url: https://api.github.com/repos/adoptium/temurin11-binaries/releases/latest
@@ -83,8 +83,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/adoptium/jdk11u.git
-        tag: jdk-11.0.28+6
-        commit: 141d7af9cd3c41de974c3d3f8017d6b21dc6d36c
+        tag: jdk-11.0.29+7
+        commit: d3b1c2be9e87aad07cac29d94679130fe5807c17
         x-checker-data:
           type: json
           url: https://api.github.com/repos/adoptium/temurin11-binaries/releases/latest
