@@ -149,6 +149,7 @@ modules:
       - mkdir -p $FLATPAK_DEST/maven
       - tar xf apache-maven-bin.tar.gz --strip-components=1 --exclude=jansi-native --directory=$FLATPAK_DEST/maven
       - ln -s $FLATPAK_DEST/maven/bin/mvn $FLATPAK_DEST/maven/bin/mvnDebug $FLATPAK_DEST/bin
+
   - name: gradle
     buildsystem: simple
     cleanup:
@@ -159,11 +160,13 @@ modules:
         dest-filename: gradle-bin.zip
         sha256: bd71102213493060956ec229d946beee57158dbd89d0e62b91bca0fa2c5f3531
         x-checker-data:
-          type: json
-          url: https://services.gradle.org/versions/current
-          is-main-source: false
-          version-query: .version
-          url-query: .downloadUrl
+          type: anitya
+          project-id: 6088
+          stable-only: true
+          url-template: https://services.gradle.org/distributions/gradle-$version-bin.zip
+          versions:
+            <: '9' # https://docs.gradle.org/current/userguide/compatibility.html#java_runtime
+
     build-commands:
       - unzip -q gradle-bin.zip -d $FLATPAK_DEST
       - mv $FLATPAK_DEST/gradle-* $FLATPAK_DEST/gradle
