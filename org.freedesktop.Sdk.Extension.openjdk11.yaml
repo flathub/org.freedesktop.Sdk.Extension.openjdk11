@@ -5,16 +5,20 @@ runtime-version: '24.08'
 build-extension: true
 sdk: org.freedesktop.Sdk
 separate-locales: false
+
 cleanup:
   - /share/info
   - /share/man
+
 build-options:
   no-debuginfo: true
   strip: true
   prefix: /usr/lib/sdk/openjdk11
   env:
     V: '1'
+
 modules:
+  # Boot JDK requirements: https://htmlpreview.github.io/?https://raw.githubusercontent.com/openjdk/jdk/master/doc/building.html#boot-jdk-requirements
   - name: bootstrap_jdk
     buildsystem: simple
     cleanup:
@@ -45,6 +49,7 @@ modules:
     build-commands:
       - mkdir -p $FLATPAK_DEST/bootstrap-java
       - tar xf java-openjdk.tar.gz --strip-components=1 --directory=$FLATPAK_DEST/bootstrap-java
+
   - name: java
     buildsystem: autotools
     no-parallel-make: true
@@ -99,6 +104,7 @@ modules:
         commands:
           - chmod a+x configure
           - git describe --match jdk-11.*+* HEAD | sed -e 's/jdk-11.*+\(\)/VERSION_BUILD=\1/' >> make/autoconf/version-numbers
+
   - name: cacerts
     buildsystem: simple
     sources:
@@ -106,6 +112,8 @@ modules:
         path: extract_cacerts.sh
     build-commands:
       - ./extract_cacerts.sh /usr/lib/sdk/openjdk11/jvm/openjdk-11
+
+  # Java version requirements for Ant: https://ant.apache.org/faq.html#java-version
   - name: ant
     buildsystem: simple
     cleanup:
@@ -126,6 +134,8 @@ modules:
       - mkdir -p $FLATPAK_DEST/ant
       - tar xf apache-ant-bin.tar.gz --strip-components=1 --directory=$FLATPAK_DEST/ant
       - ln -s $FLATPAK_DEST/ant/bin/ant $FLATPAK_DEST/bin
+
+  # Java version requirements for Maven: https://maven.apache.org/docs/history.html
   - name: maven
     buildsystem: simple
     cleanup:
@@ -149,6 +159,7 @@ modules:
       - tar xf apache-maven-bin.tar.gz --strip-components=1 --exclude=jansi-native --directory=$FLATPAK_DEST/maven
       - ln -s $FLATPAK_DEST/maven/bin/mvn $FLATPAK_DEST/maven/bin/mvnDebug $FLATPAK_DEST/bin
 
+  # Java version requirements for Gradle: https://docs.gradle.org/current/userguide/compatibility.html#java_runtime
   - name: gradle
     buildsystem: simple
     cleanup:
@@ -164,12 +175,12 @@ modules:
           stable-only: true
           url-template: https://services.gradle.org/distributions/gradle-$version-bin.zip
           versions:
-            <: '9' # https://docs.gradle.org/current/userguide/compatibility.html#java_runtime
-
+            <: '9'
     build-commands:
       - unzip -q gradle-bin.zip -d $FLATPAK_DEST
       - mv $FLATPAK_DEST/gradle-* $FLATPAK_DEST/gradle
       - ln -s $FLATPAK_DEST/gradle/bin/gradle $FLATPAK_DEST/bin
+
   - name: scripts
     buildsystem: simple
     sources:
@@ -194,6 +205,7 @@ modules:
         dest-filename: enable.sh
     build-commands:
       - cp enable.sh install.sh installjdk.sh /usr/lib/sdk/openjdk11/
+
   - name: appdata
     buildsystem: simple
     sources:
