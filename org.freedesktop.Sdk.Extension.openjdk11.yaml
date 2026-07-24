@@ -78,7 +78,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/adoptium/jdk11u.git
-        tag: jdk-11.0.32-ga
+        tag: jdk-11.0.32+9
         commit: f67076179e1cd0db7a2bf291e6dfcf14c3bdaf2d
         x-checker-data:
           type: json
