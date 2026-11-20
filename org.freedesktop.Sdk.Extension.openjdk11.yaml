@@ -78,8 +78,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/adoptium/jdk11u.git
-        tag: jdk-11.0.33+10
-        commit: d001c53e35a816f26718845b5d26a877878a7f5d
+        tag: jdk-11.0.33.1+1
+        commit: 8404542c8c9d0df7eedb7e511f2a02c17585a8b2
         x-checker-data:
           type: json
           url: https://api.github.com/repos/adoptium/temurin11-binaries/releases/latest
